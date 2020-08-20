@@ -21,31 +21,32 @@ export class MainPageComponent implements OnInit {
   ){ }
 
   ngOnInit(){
-    let i = 1;
+    let interval = 1;
     let num = this.data.getHostsLength; // количество заданных источников
     let availability: boolean = true;
 
     let timerId = setInterval( () => { 
-      this.titleService.setTitle('До следующего запроса: ' + i); 
+      this.titleService.setTitle('До следующего запроса: ' + interval); 
 
-      if (i <= 0) { //
+      if (interval <= 0) { //
         let item = new Item;
 
         if( availability == false ){ // Источник недоступен 10 секунд! Меняем
           item.currentSourceNumber = `Источник номер ${this.data.getI} недоступен!`;
           item.currentValue = null;
           this.items.push(item);
-
-          this.data.incI;
+          interval = 10;
+          
+          this.data.incI();
           availability = true;
           if(this.data.getI >= num){ // Источники закончились
             clearInterval(timerId);
           }
         } else {         
           availability = false;
-          i = 10;
           this.data.getCourse().subscribe( 
             (request) => {
+              interval = 10;
               availability = true;
               item.currentSourceNumber = this.data.getI;
               switch( this.data.getHostsType ){
@@ -56,7 +57,7 @@ export class MainPageComponent implements OnInit {
             });
         }
       }
-      i--;
+      interval--;
     }, 1000);
     
   }
