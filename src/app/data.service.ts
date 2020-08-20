@@ -31,7 +31,7 @@ export class DataService{
 
   getCourse(): Observable<any>{
     let ret: Observable<any>;
-    switch( this.hostings[this.i].type){
+    switch( this.getHostsType){
       case "xml": ret = this.getItems('text'); break;
       case "json": ret = this.getItems('json'); break;
     }
