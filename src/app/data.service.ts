@@ -7,14 +7,12 @@ import { Hosts } from './config/hosts';
 
 @Injectable()
 export class DataService{
-  hostings = (new Hosts).host;
-  i: number = 0;
+  private hostings = (new Hosts).host;
+  private i: number = 0;
 
   constructor(
     private http: HttpClient
-  ){
-    
-  }
+  ){}
 
   private getItems(responseType): Observable<any> {
     return this.http.get<any>('https://cors-anywhere.herokuapp.com/'+this.hostings[this.i].name, { responseType: responseType});
@@ -38,6 +36,22 @@ export class DataService{
       case "json": ret = this.getItems('json'); break;
     }
     return ret;
+  }
+
+  get getHostsLength(): number{
+    return this.hostings.length;
+  }
+
+  get getI(): number{
+    return this.i;
+  }
+
+  incI(){ 
+    this.i++; 
+  }
+
+  get getHostsType(): string {
+    return this.hostings[this.i].type;
   }
   
 }

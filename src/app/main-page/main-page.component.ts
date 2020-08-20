@@ -22,7 +22,7 @@ export class MainPageComponent implements OnInit {
 
   ngOnInit(){
     let i = 1;
-    let num = this.data.hostings.length; // количество заданных источников
+    let num = this.data.getHostsLength; // количество заданных источников
     let availability: boolean = true;
 
     let timerId = setInterval( () => { 
@@ -32,13 +32,13 @@ export class MainPageComponent implements OnInit {
         let item = new Item;
 
         if( availability == false ){ // Источник недоступен 10 секунд! Меняем
-          item.currentSourceNumber = `Источник номер ${this.data.i} недоступен!`;
+          item.currentSourceNumber = `Источник номер ${this.data.getI} недоступен!`;
           item.currentValue = null;
           this.items.push(item);
 
-          this.data.i++;
+          this.data.incI;
           availability = true;
-          if(this.data.i >= num){ // Источники закончились
+          if(this.data.getI >= num){ // Источники закончились
             clearInterval(timerId);
           }
         } else {         
@@ -47,8 +47,8 @@ export class MainPageComponent implements OnInit {
           this.data.getCourse().subscribe( 
             (request) => {
               availability = true;
-              item.currentSourceNumber = this.data.i;
-              switch( this.data.hostings[this.data.i].type){
+              item.currentSourceNumber = this.data.getI;
+              switch( this.data.getHostsType ){
                 case "xml": item.currentValue = this.data.getXml(request); break;
                 case "json": item.currentValue = this.data.getOther(request); break;
               }
