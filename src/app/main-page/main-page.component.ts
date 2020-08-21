@@ -14,6 +14,10 @@ export class Item{
 export class MainPageComponent implements OnInit {
 
   items: Item[] = [];
+
+  private interval = 1;
+  private num = this.data.getHostsLength; // количество заданных источников
+  private availability: boolean = true;
   
   constructor(
     private titleService: Title,
@@ -21,45 +25,51 @@ export class MainPageComponent implements OnInit {
   ){ }
 
   ngOnInit(){
-    let interval = 1;
-    let num = this.data.getHostsLength; // количество заданных источников
-    let availability: boolean = true;
+    this.surveySources();
+  }
 
+  private surveySources(){
     let timerId = setInterval( () => { 
-      this.titleService.setTitle('До следующего запроса: ' + interval); 
-
-      if (interval <= 0) { //
-        let item = new Item;
-
-        if( availability == false ){ // Источник недоступен 10 секунд! Меняем
-          item.currentSourceNumber = `Источник номер ${this.data.getI} недоступен!`;
-          item.currentValue = null;
-          this.items.push(item);
-          interval = 10;
-          
-          this.data.incI();
-          availability = true;
-          if(this.data.getI >= num){ // Источники закончились
-            clearInterval(timerId);
-          }
+      this.titleService.setTitle('До следующего запроса: ' + this.interval); 
+      if (this.interval <= 0) { 
+        if( this.availability == false ){ // Источник недоступен 10 секунд! Меняем
+          this.sourceNotAllowed(timerId);
         } else {         
-          availability = false;
-          this.data.getCourse().subscribe( 
-            (request) => {
-              interval = 10;
-              availability = true;
-              item.currentSourceNumber = this.data.getI;
-              switch( this.data.getHostsType ){
-                case "xml": item.currentValue = this.data.getXml(request); break;
-                case "json": item.currentValue = this.data.getOther(request); break;
-              }
-              this.items.push(item);
-            });
+          this.sourceAllowed();
         }
       }
-      interval--;
+      this.interval--;
     }, 1000);
-    
+  }
+
+  private sourceNotAllowed(timerId){
+    let item = new Item;
+    item.currentSourceNumber = `Источник номер ${this.data.getI} недоступен!`;
+    item.currentValue = null;
+    this.items.push(item);
+    this.interval = 10;
+
+    this.data.incI();
+    this.availability = true;
+    if(this.data.getI >= this.num){ // Источники закончились
+      clearInterval(timerId);
+    }
+  }
+
+  private sourceAllowed(){
+    let item = new Item;
+    this. availability = false;
+    this.data.getCourse().subscribe( 
+      (request) => {
+        this.interval = 10;
+        this.availability = true;
+        item.currentSourceNumber = this.data.getI;
+        switch( this.data.getHostsType ){
+          case "xml": item.currentValue = this.data.getXml(request); break;
+          case "json": item.currentValue = this.data.getOther(request); break;
+        }
+        this.items.push(item);
+      });
   }
 
   
